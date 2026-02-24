@@ -1,0 +1,75 @@
+{
+    "pages": [
+        {
+            "path": "pages/calculator/index",
+            "style": {
+                "navigationBarTitleText": "计算器"
+            }
+        },
+        {
+            "path": "pages/history/index",
+            "style": {
+                "navigationBarTitleText": "历史记录"
+            }
+        },
+        {
+            "path": "pages/positions/index",
+            "style": {
+                "navigationBarTitleText": "持仓管理"
+            }
+        },
+        {
+            "path": "pages/futures/index",
+            "style": {
+                "navigationBarTitleText": "期货行情"
+            }
+        }
+    ],
+    "subPackages": [
+        {
+            "root": "subpackages/stocks",
+            "pages": [
+                {
+                    "path": "pages/index",
+                    "style": {
+                        "navigationBarTitleText": "股票季线"
+                    }
+                }
+            ]
+        }
+    ],
+    "tabBar": {
+        "color": "#999",
+        "selectedColor": "#6366f1",
+        "backgroundColor": "#1a1a2e",
+        "borderStyle": "black",
+        "list": [
+            {
+                "pagePath": "pages/calculator/index",
+                "text": "计算器",
+                "iconText": "🖥️"
+            },
+            {
+                "pagePath": "pages/history/index",
+                "text": "历史",
+                "iconText": "📝"
+            },
+            {
+                "pagePath": "pages/positions/index",
+                "text": "持仓",
+                "iconText": "📊"
+            },
+            {
+                "pagePath": "pages/futures/index",
+                "text": "期货",
+                "iconText": "📈"
+            }
+        ]
+    },
+    "globalStyle": {
+        "navigationBarTextStyle": "white",
+        "navigationBarTitleText": "交易计算器",
+        "navigationBarBackgroundColor": "#0f0f23",
+        "backgroundColor": "#0f0f23"
+    }
+}
