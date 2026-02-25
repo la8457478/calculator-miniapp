@@ -19,9 +19,9 @@
         <text class="input-prefix">🔍</text>
         <input
           class="form-input"
-          v-model="searchText"
+          :value="searchText"
           placeholder="搜索股票代码/名称..."
-          @input="onSearch"
+          @input="onSearchTextInput"
         />
       </view>
     </view>
@@ -165,7 +165,9 @@ export default {
     }));
   },
   methods: {
-    onSearch() { /* computed 自动处理 */ },
+    onSearchTextInput(e) {
+      this.searchText = e.detail.value;
+    },
 
     getBreakoutPrice(stock) {
       if (!stock.quarters || stock.quarters.length < 2) return '-';

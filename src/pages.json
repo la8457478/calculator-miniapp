@@ -23,6 +23,12 @@
             "style": {
                 "navigationBarTitleText": "期货行情"
             }
+        },
+        {
+            "path": "pages/futures/chart",
+            "style": {
+                "navigationBarTitleText": "周线详情"
+            }
         }
     ],
     "subPackages": [

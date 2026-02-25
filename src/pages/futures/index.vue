@@ -97,7 +97,8 @@
                     class="pending-risk-input"
                     type="digit"
                     :value="pendingRisk[future.code + '_main'] || ''"
-                    @input="e => setPendingRisk(future.code + '_main', e)"
+                    :data-key="future.code + '_main'"
+                    @input="onPendingRiskInput"
                     placeholder="3000"
                     @tap.stop
                   />
@@ -150,7 +151,8 @@
                     class="pending-risk-input"
                     type="digit"
                     :value="pendingRisk[future.code + '_sub'] || ''"
-                    @input="e => setPendingRisk(future.code + '_sub', e)"
+                    :data-key="future.code + '_sub'"
+                    @input="onPendingRiskInput"
                     placeholder="3000"
                     @tap.stop
                   />
@@ -341,6 +343,11 @@ export default {
       if (!w2) return '-';
       const isLong = contract.latestKDJ?.custom_rule_2 === 'pending_long';
       return isLong ? w2.high?.toFixed(1) : w2.low?.toFixed(1);
+    },
+
+    onPendingRiskInput(e) {
+      const key = e.currentTarget.dataset.key;
+      this.pendingRisk[key] = e.detail.value;
     },
 
     getStopPrice(contract) {

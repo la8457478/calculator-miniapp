@@ -102,9 +102,10 @@
           <input
             class="modal-input"
             type="digit"
-            v-model="closePrice"
+            :value="closePrice"
             placeholder="请输入平仓价格"
             style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:10px 14px; color:#e2e8f0; width:100%; font-size:1rem;"
+            @input="onClosePriceInput"
           />
         </view>
         <view class="btn-row">
@@ -124,8 +125,9 @@
           <input
             class="modal-input"
             type="digit"
-            v-model="editBuyPrice"
+            :value="editBuyPrice"
             style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:10px 14px; color:#e2e8f0; width:100%; font-size:1rem;"
+            @input="onEditBuyPriceInput"
           />
         </view>
         <view class="form-group">
@@ -133,8 +135,9 @@
           <input
             class="modal-input"
             type="number"
-            v-model="editQty"
+            :value="editQty"
             style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:10px 14px; color:#e2e8f0; width:100%; font-size:1rem;"
+            @input="onEditQtyInput"
           />
         </view>
         <view class="btn-row">
@@ -224,13 +227,14 @@ export default {
       }
       const idx = this.allList.findIndex(p => p.id === this.closeTarget.id);
       if (idx !== -1) {
-        this.allList[idx] = {
+        // Use splice to replace element so Vue 2 reactivity is triggered
+        this.allList.splice(idx, 1, {
           ...this.allList[idx],
           status: 'closed',
           closePrice: price,
           closeTime: new Date().toISOString(),
           profit,
-        };
+        });
         this.save();
       }
       this.showCloseModal = false;
@@ -244,6 +248,16 @@ export default {
       this.showEditModal = true;
     },
 
+    onClosePriceInput(e) {
+      this.closePrice = e.detail.value;
+    },
+    onEditBuyPriceInput(e) {
+      this.editBuyPrice = e.detail.value;
+    },
+    onEditQtyInput(e) {
+      this.editQty = e.detail.value;
+    },
+
     confirmEdit() {
       const price = parseFloat(this.editBuyPrice);
       const qty = parseInt(this.editQty);
@@ -252,8 +266,12 @@ export default {
       }
       const idx = this.allList.findIndex(p => p.id === this.editTarget.id);
       if (idx !== -1) {
-        this.allList[idx].buyPrice = price;
-        this.allList[idx].quantity = qty;
+        // Use splice to replace element so Vue 2 reactivity is triggered
+        this.allList.splice(idx, 1, {
+          ...this.allList[idx],
+          buyPrice: price,
+          quantity: qty,
+        });
         this.save();
       }
       this.showEditModal = false;

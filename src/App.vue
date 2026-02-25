@@ -56,6 +56,8 @@ view, text, input, button {
 /* 表单 */
 .form-group {
   margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
 }
 .form-label {
   display: block;
@@ -71,6 +73,9 @@ view, text, input, button {
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 8px;
   padding: 0 12px;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
 }
 .input-prefix {
   color: #64748b;
@@ -85,6 +90,9 @@ view, text, input, button {
   font-size: 1rem;
   padding: 12px 0;
   width: 100%;
+  position: relative;
+  z-index: 6;
+  pointer-events: auto;
 }
 .form-input::placeholder {
   color: #475569;
@@ -511,6 +519,7 @@ view, text, input, button {
 /* 搜索下拉 */
 .search-dropdown {
   position: relative;
+  z-index: 10;
 }
 .search-input-box {
   display: flex;
@@ -533,7 +542,7 @@ view, text, input, button {
   border-radius: 8px;
   max-height: 240px;
   overflow-y: auto;
-  z-index: 100;
+  z-index: 20;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 .dropdown-item {

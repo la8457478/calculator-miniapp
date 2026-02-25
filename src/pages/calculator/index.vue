@@ -96,9 +96,10 @@
           <input
             class="form-input"
             type="digit"
-            v-model="buyPrice"
+            :value="buyPrice"
+            @focus="closeDropdowns"
             placeholder="请输入买入价格"
-            @input="calculate"
+            @input="onBuyPriceInput"
           />
         </view>
       </view>
@@ -111,9 +112,10 @@
           <input
             class="form-input"
             type="digit"
-            v-model="stopLoss"
+            :value="stopLoss"
+            @focus="closeDropdowns"
             placeholder="请输入止损价格"
-            @input="calculate"
+            @input="onStopLossInput"
           />
         </view>
       </view>
@@ -126,9 +128,10 @@
           <input
             class="form-input"
             type="digit"
-            v-model="riskAmount"
+            :value="riskAmount"
+            @focus="closeDropdowns"
             placeholder="请输入最大风险金额"
-            @input="calculate"
+            @input="onRiskAmountInput"
           />
         </view>
       </view>
@@ -199,8 +202,9 @@
             <input
               class="form-input modal-input"
               type="number"
-              v-model="saveQty"
+              :value="saveQty"
               :placeholder="mode === 'futures' ? '手数' : '股数'"
+              @input="onSaveQtyInput"
             />
           </view>
           <view class="form-group">
@@ -281,7 +285,15 @@ export default {
   methods: {
     fmt(v) { return formatNumber(v); },
 
+    closeDropdowns() {
+      this.showFuturesDropdown = false;
+      this.showStockDropdown = false;
+      this.futuresSearchFocused = false;
+      this.stockSearchFocused = false;
+    },
+
     switchMode(m) {
+      this.closeDropdowns();
       this.mode = m;
       this.result = null;
       this.errorMsg = '';
@@ -290,6 +302,8 @@ export default {
 
     // ===== 期货搜索 =====
     onFuturesSearchFocus() {
+      this.showStockDropdown = false;
+      this.stockSearchFocused = false;
       this.futuresSearchFocused = true;
       this.showFuturesDropdown = true;
       this.filteredFutures = futuresList.slice(0, 20);
@@ -318,6 +332,8 @@ export default {
 
     // ===== 股票搜索 =====
     onStockSearchFocus() {
+      this.showFuturesDropdown = false;
+      this.futuresSearchFocused = false;
       this.stockSearchFocused = true;
       this.showStockDropdown = true;
       this.filteredStocks = getStocksData().slice(0, 15);
@@ -346,6 +362,22 @@ export default {
       this.selectedStock = item;
       this.stockSearchText = `${item.name} (${item.code})`;
       this.showStockDropdown = false;
+    },
+
+    onBuyPriceInput(e) {
+      this.buyPrice = e.detail.value;
+      this.calculate();
+    },
+    onStopLossInput(e) {
+      this.stopLoss = e.detail.value;
+      this.calculate();
+    },
+    onRiskAmountInput(e) {
+      this.riskAmount = e.detail.value;
+      this.calculate();
+    },
+    onSaveQtyInput(e) {
+      this.saveQty = e.detail.value;
     },
 
     // ===== 核心计算 =====
@@ -458,6 +490,18 @@ export default {
 </script>
 
 <style scoped>
+.form-group,
+.input-wrapper,
+.form-input {
+  position: relative;
+}
+
+.input-wrapper,
+.form-input {
+  z-index: 30;
+  pointer-events: auto;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
