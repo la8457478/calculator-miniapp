@@ -31,17 +31,19 @@ view, text, input, button {
 /* 头部 */
 .app-header {
   text-align: center;
-  padding: 20px 0 10px;
+  padding: 24px 0 16px;
 }
 .app-title {
+  display: block;
   font-size: 1.5rem;
   font-weight: 700;
   color: #e2e8f0;
+  margin-bottom: 6px;
 }
 .app-subtitle {
+  display: block;
   font-size: 0.85rem;
   color: #64748b;
-  margin-top: 4px;
 }
 
 /* 卡片 */
@@ -61,9 +63,9 @@ view, text, input, button {
 }
 .form-label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   color: #94a3b8;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 500;
 }
 .input-wrapper {
@@ -79,16 +81,16 @@ view, text, input, button {
 }
 .input-prefix {
   color: #64748b;
-  margin-right: 8px;
-  font-size: 0.9rem;
+  margin-right: 10px;
+  font-size: 1rem;
 }
 .form-input {
   flex: 1;
   background: transparent;
   border: none;
   color: #e2e8f0;
-  font-size: 1rem;
-  padding: 12px 0;
+  font-size: 1.1rem;
+  padding: 14px 0;
   width: 100%;
   position: relative;
   z-index: 6;
@@ -109,12 +111,12 @@ view, text, input, button {
 }
 .mode-btn {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
   border: none;
   background: transparent;
   color: #64748b;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -167,16 +169,22 @@ view, text, input, button {
 
 /* 空状态 */
 .empty-state {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 40px 20px;
   color: #475569;
 }
 .empty-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
+  font-size: 3rem;
+  margin-bottom: 16px;
+  line-height: 1;
 }
 .empty-text {
-  font-size: 0.95rem;
+  font-size: 1rem;
+  text-align: center;
+  display: block;
 }
 
 /* 按钮 */

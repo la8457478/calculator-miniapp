@@ -89,7 +89,7 @@
     <view v-else class="empty-state">
       <text class="empty-icon">📈</text>
       <text class="empty-text">暂无持仓记录</text>
-      <text style="color: #475569; font-size: 0.8rem; margin-top: 6px;">在计算器页面保存计算结果为持仓</text>
+      <text style="display: block; text-align: center; color: #475569; font-size: 0.8rem; margin-top: 6px;">在计算器页面保存计算结果为持仓</text>
     </view>
 
     <!-- 平仓弹窗 -->

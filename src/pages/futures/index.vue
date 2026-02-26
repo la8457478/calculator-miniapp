@@ -182,7 +182,7 @@
     <view v-else class="empty-state">
       <text class="empty-icon">📊</text>
       <text class="empty-text">暂无数据</text>
-      <text style="color: #475569; font-size: 0.8rem; margin-top: 6px;">运行 fetch_futures.py 获取行情数据</text>
+      <text style="display: block; text-align: center; color: #475569; font-size: 0.8rem; margin-top: 6px;">运行 fetch_futures.py 获取行情数据</text>
     </view>
 
     <!-- K 线图弹窗（H5 端使用，小程序端在新页面显示） -->
@@ -209,12 +209,14 @@
 import { futuresData } from '@/data/futures_specs.js';
 import { calcPendingPosition } from '@/utils/calculator.js';
 
-// 动态加载期货行情数据（约 386KB，已追加 ES export）
+// 直接使用 ES 导入，避免小程序中的 require 和按需加载兼容问题
+import { FUTURES_DATA as localData } from '@/data/futures_data.js';
+
 let _FUTURES_DATA = null;
 function getFuturesData() {
   if (!_FUTURES_DATA) {
     try {
-      _FUTURES_DATA = require('@/data/futures_data.js').FUTURES_DATA || {};
+      _FUTURES_DATA = localData || {};
     } catch (e) {
       console.warn('[futures] 数据加载失败:', e);
       _FUTURES_DATA = {};
@@ -258,7 +260,7 @@ export default {
       });
     }
   },
-  onLoad() {
+  onShow() {
     this.loadData();
   },
   methods: {

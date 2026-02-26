@@ -50,7 +50,7 @@
     <view v-else class="empty-state">
       <text class="empty-icon">📭</text>
       <text class="empty-text">暂无计算记录</text>
-      <text style="color: #475569; font-size: 0.8rem; margin-top: 6px;">在计算器页面完成计算后点击"记录历史"</text>
+      <text style="display: block; text-align: center; color: #475569; font-size: 0.8rem; margin-top: 6px;">在计算器页面完成计算后点击"记录历史"</text>
     </view>
   </view>
 </template>

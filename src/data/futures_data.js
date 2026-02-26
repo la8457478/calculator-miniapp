@@ -16454,5 +16454,4 @@ const FUTURES_DATA = {
   }
 };
 
-if (typeof module !== 'undefined' && module.exports) { module.exports = FUTURES_DATA; }
 export { FUTURES_DATA };

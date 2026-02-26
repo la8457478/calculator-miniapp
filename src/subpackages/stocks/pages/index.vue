@@ -97,18 +97,15 @@
     </view>
   </view>
 </template>
-
 <script>
+import { stocksData as localStocksData } from '@/data/stocks_data.js';
+
 // 懒加载股票季度数据（体积较大，分包按需加载）
 let _data = null;
 function getData() {
   if (!_data) {
     try {
-      // stocks_quarterly.html 使用的 stocksQuarterlyData 全局变量
-      // 此处引用 stocks_data.js 中的 stockList 作为搜索数据
-      // 季度分析数据需要单独引入 stocks_quarterly_pending.json
-      const raw = require('@/data/stocks_data.js').stocksData || [];
-      _data = raw;
+      _data = localStocksData || [];
     } catch (e) {
       _data = [];
     }
@@ -150,7 +147,7 @@ export default {
       return list.slice(0, 100); // 只显示前100条避免卡顿
     }
   },
-  onLoad() {
+  onShow() {
     // 加载股票列表（仅包含 code/name，作为基础数据展示）
     const raw = getData();
     // 转换为带 pending 字段的格式（实际季度分析数据需加载 stocks_quarterly_pending.json）
