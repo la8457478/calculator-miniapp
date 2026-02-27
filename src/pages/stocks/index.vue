@@ -44,7 +44,8 @@
         v-for="stock in displayList"
         :key="stock.code"
         class="card"
-        style="margin-bottom: 12px;"
+        style="margin-bottom: 12px; cursor:pointer;"
+        @tap="openDetail(stock)"
       >
         <view style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <view>
@@ -148,20 +149,56 @@ export default {
     }
   },
   onShow() {
-    // 加载股票列表（仅包含 code/name，作为基础数据展示）
-    const raw = getData();
-    // 转换为带 pending 字段的格式（实际季度分析数据需加载 stocks_quarterly_pending.json）
-    this.allList = raw.map(s => ({
-      code: s.code,
-      name: s.name,
-      market: s.market,
-      pending_long: false,
-      pending_short: false,
-      quarters: [],
-      current_price: null,
-    }));
+    this._loadFromApi();
   },
   methods: {
+    async _loadFromApi() {
+      try {
+        await new Promise((resolve, reject) => {
+          uni.request({
+            url: 'http://127.0.0.1:8000/api/stocks/quarterly',
+            method: 'GET',
+            timeout: 5000,
+            success: (res) => {
+              if (res.statusCode === 200 && res.data?.code === 0) {
+                // 把 API 返回的格式，转化为页面使用的格式
+                this.allList = res.data.data.map(s => ({
+                  code: s.code,
+                  name: s.name,
+                  pending_long: s.signal === '蓄势多',
+                  pending_short: s.signal === '蓄势空',
+                  breakout_price: s.breakout_price,
+                  current_price: null, // 实时价格后续可以再加
+                  quarters: (s.quarters || []).map(q => ({
+                    quarter: q.quarter,
+                    q_high: q.q_high,
+                    q_low: q.q_low,
+                    close: q.close,
+                  }))
+                }));
+                resolve();
+              } else {
+                reject(new Error('API 返回异常'));
+              }
+            },
+            fail: reject
+          });
+        });
+      } catch (e) {
+        console.warn('[stocks] API 获取失败，使用本地数据:', e.message);
+        // 降级：读本地静态 JS
+        const raw = getData();
+        this.allList = raw.map(s => ({
+          code: s.code,
+          name: s.name,
+          market: s.market || '',
+          pending_long: false,
+          pending_short: false,
+          quarters: [],
+          current_price: null,
+        }));
+      }
+    },
     onSearchTextInput(e) {
       this.searchText = e.detail.value;
     },
@@ -176,6 +213,10 @@ export default {
       if (!stock.quarters || stock.quarters.length < 2) return '-';
       const q2 = stock.quarters[stock.quarters.length - 2];
       return q2?.q_low || '-';
+    },
+
+    openDetail(stock) {
+      uni.navigateTo({ url: `/pages/stocks/detail?code=${stock.code}` });
     },
 
     isNearBreakout(stock) {

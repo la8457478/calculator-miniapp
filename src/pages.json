@@ -35,19 +35,18 @@
             "style": {
                 "navigationBarTitleText": "周线详情"
             }
-        }
-    ],
-    "subPackages": [
+        },
         {
-            "root": "subpackages/stocks",
-            "pages": [
-                {
-                    "path": "pages/index",
-                    "style": {
-                        "navigationBarTitleText": "股票季线"
-                    }
-                }
-            ]
+            "path": "pages/stocks/index",
+            "style": {
+                "navigationBarTitleText": "股票季线"
+            }
+        },
+        {
+            "path": "pages/stocks/detail",
+            "style": {
+                "navigationBarTitleText": "K线详情"
+            }
         }
     ],
     "tabBar": {
@@ -59,22 +58,32 @@
             {
                 "pagePath": "pages/calculator/index",
                 "text": "计算器",
-                "iconText": "🖥️"
+                "iconPath": "static/tabbar/calc.png",
+                "selectedIconPath": "static/tabbar/calc-active.png"
             },
             {
                 "pagePath": "pages/history/index",
                 "text": "历史",
-                "iconText": "📝"
+                "iconPath": "static/tabbar/history.png",
+                "selectedIconPath": "static/tabbar/history-active.png"
             },
             {
                 "pagePath": "pages/positions/index",
                 "text": "持仓",
-                "iconText": "📊"
+                "iconPath": "static/tabbar/pos.png",
+                "selectedIconPath": "static/tabbar/pos-active.png"
             },
             {
                 "pagePath": "pages/futures/index",
                 "text": "期货",
-                "iconText": "📈"
+                "iconPath": "static/tabbar/futures.png",
+                "selectedIconPath": "static/tabbar/futures-active.png"
+            },
+            {
+                "pagePath": "pages/stocks/index",
+                "text": "股票",
+                "iconPath": "static/tabbar/stocks.png",
+                "selectedIconPath": "static/tabbar/stocks-active.png"
             }
         ]
     },

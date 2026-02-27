@@ -8,7 +8,7 @@
 
     <view class="card">
       <!-- 模式切换 -->
-      <view class="mode-selector">
+      <view class="mode-selector" style="margin-bottom: 8px;">
         <button
           :class="['mode-btn', mode === 'stock' ? 'active' : '']"
           @tap="switchMode('stock')"
@@ -17,6 +17,26 @@
           :class="['mode-btn', mode === 'futures' ? 'active' : '']"
           @tap="switchMode('futures')"
         >期货模式</button>
+      </view>
+
+      <!-- 快捷入口区 -->
+      <view class="quick-links" style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+        <view
+          v-if="mode === 'stock'"
+          style="color: #6366f1; font-size: 0.85rem; display: flex; align-items: center;"
+          @tap="gotoPage('/pages/stocks/index')"
+        >
+          <text>📊 股票季线分析</text>
+          <text style="margin-left: 4px;">→</text>
+        </view>
+        <view
+          v-if="mode === 'futures'"
+          style="color: #6366f1; font-size: 0.85rem; display: flex; align-items: center;"
+          @tap="gotoPage('/pages/futures/index')"
+        >
+          <text>📈 期货周线行情</text>
+          <text style="margin-left: 4px;">→</text>
+        </view>
       </view>
 
       <!-- 期货品种选择 -->
@@ -283,6 +303,15 @@ export default {
     }
   },
   methods: {
+    gotoPage(url) {
+      // tabBar 页面使用 switchTab，其余使用 navigateTo
+      const tabBarPages = ['/pages/calculator/index', '/pages/history/index', '/pages/positions/index', '/pages/futures/index', '/pages/stocks/index'];
+      if (tabBarPages.includes(url)) {
+        uni.switchTab({ url });
+      } else {
+        uni.navigateTo({ url });
+      }
+    },
     fmt(v) { return formatNumber(v); },
 
     closeDropdowns() {

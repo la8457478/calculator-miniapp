@@ -1,0 +1,35 @@
+{
+    "name": "calculator-miniapp",
+    "version": "1.0.0",
+    "description": "Trading Calculator - Uni-app cross-platform (Web + WeChat Mini Program)",
+    "scripts": {
+        "dev:h5": "uni",
+        "build:h5": "uni build",
+        "dev:mp-weixin": "uni -p mp-weixin",
+        "build:mp-weixin": "uni build -p mp-weixin"
+    },
+    "dependencies": {
+        "@babel/runtime": "^7.28.6",
+        "@babel/runtime-corejs3": "^7.29.0",
+        "@dcloudio/uni-app": "3.0.0-alpha-5000120260211001",
+        "@dcloudio/uni-components": "3.0.0-alpha-5000120260211001",
+        "@dcloudio/uni-h5": "3.0.0-alpha-5000120260211001",
+        "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5000120260211001",
+        "@qiun/uni-ucharts": "^2.5.0-20230101",
+        "core-js": "^3.36.0",
+        "core-js-pure": "^3.36.0",
+        "pinia": "^2.1.7",
+        "ucharts": "^0.0.0",
+        "vue": "^3.3.13"
+    },
+    "devDependencies": {
+        "@dcloudio/types": "^3.3.3",
+        "@dcloudio/uni-cli-shared": "3.0.0-alpha-5000120260211001",
+        "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5000120260211001",
+        "@vitejs/plugin-vue": "^4.5.2",
+        "vite": "^4.5.3"
+    },
+    "engines": {
+        "node": ">=16"
+    }
+}

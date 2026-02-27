@@ -1,0 +1,52 @@
+# Uni-app 前端任务清单
+
+## 阶段零：项目初始化
+- [x] 确认 Node.js 和 HBuilderX / @dcloudio CLI 环境
+- [x] 用 vue-cli 创建 Uni-app 项目（Vue 3 + Vite 模板）
+- [x] 配置 [pages.json](file:///d:/workspace/calculator-miniapp/src/pages.json)：5 个主页面 + 分包（stocks 季线）
+- [x] 将 [style.css](file:///d:/workspace/Calculator/style.css) 转为 [App.vue](file:///d:/workspace/calculator-miniapp/src/App.vue) 全局样式（移除 Google Fonts）
+- [x] 复制 [futures_data.js](file:///d:/workspace/Calculator/futures_data.js)、[stocks_data.js](file:///d:/workspace/Calculator/stocks_data.js)、[futures_specs.js](file:///d:/workspace/Calculator/futures_specs.js) 到 `src/data/`
+
+## 阶段一：工具层（utils）
+- [x] [utils/storage.js](file:///d:/workspace/calculator-miniapp/src/utils/storage.js)：封装 uni.setStorageSync / localStorage（条件编译）
+- [x] `utils/request.js`：封装 uni.request / fetch（预留后端 API）
+- [x] [utils/calculator.js](file:///d:/workspace/calculator-miniapp/src/utils/calculator.js)：从 script.js 提取纯计算函数（calculateFuturesContracts / calculateStockShares）
+- [x] [utils/format.js](file:///d:/workspace/calculator-miniapp/src/utils/format.js)：formatNumber / formatDateTime
+
+## 阶段二：计算器页（pages/calculator/index.vue）
+- [x] 迁移表单结构（模式切换、搜索下拉、价格输入）
+- [x] 实现期货品种搜索选择器（自定义组件，Picker 替代方案）
+- [x] 实现股票代码搜索选择器
+- [x] 接入 calculator.js 计算逻辑
+- [x] 实现"保存历史"和"保存持仓"功能
+- [x] 重置按钮功能
+
+## 阶段三：历史记录页（pages/history/index.vue）
+- [x] 读取 storage 渲染历史列表
+- [x] 删除单条 / 清空全部
+- [x] 模态弹窗改为 uni.showModal
+
+## 阶段四：持仓管理页（pages/positions/index.vue）
+- [x] 读取 storage 渲染持仓列表
+- [x] 用户筛选（刘安 / 康哥 / 全部）
+- [x] 平仓功能（弹窗输入平仓价）
+- [x] 编辑 / 删除持仓
+- [x] 盈亏计算
+
+## 阶段五：期货行情页（pages/futures/index.vue）
+- [x] 引入 [futures_data.js](file:///d:/workspace/Calculator/futures_data.js) / [futures_specs.js](file:///d:/workspace/Calculator/futures_specs.js)（先用本地静态数据）
+- [x] 渲染品种卡片列表（主力 + 次主力）
+- [x] KDJ 指标展示 + 规则标签
+- [x] 蓄势高亮 + 内联计算器
+- [x] K 线图弹窗（使用 uCharts 或 uni-echarts 组件）
+- [x] 筛选按钮（全部 / S2: 蓄势）
+
+## 阶段六：股票季线页（subpackages/stocks/index.vue 分包）
+- [x] 迁移 stocks_quarterly.html 功能
+- [x] 引入 stocks_data.js（分包处理体积）
+- [x] 筛选：蓄势中 / 蓄势未突破 / 接近突破
+
+## 阶段七：验证
+- [ ] H5 端（浏览器）验证全部 5 个页面功能正常
+- [ ] 微信开发者工具验证小程序端页面正常
+- [ ] localStorage ↔ wx.setStorageSync 数据互通确认

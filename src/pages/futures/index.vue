@@ -264,11 +264,40 @@ export default {
     this.loadData();
   },
   methods: {
-    loadData() {
-      const data = getFuturesData();
-      this.futuresList = Object.values(data);
-      this.calcSummary(data);
+    async loadData() {
+      try {
+        // 优先从后端 API 获取最新数据
+        const apiList = await this._fetchFromApi();
+        this.futuresList = apiList;
+        this.calcSummaryFromList(apiList);
+      } catch (e) {
+        console.warn('[futures] API 获取失败，降级到本地数据:', e.message);
+        // 降级：读本地静态 JS
+        const data = getFuturesData();
+        this.futuresList = Object.values(data);
+        this.calcSummary(data);
+      }
     },
+
+    _fetchFromApi() {
+      return new Promise((resolve, reject) => {
+        uni.request({
+          url: 'http://127.0.0.1:8000/api/futures/list',
+          method: 'GET',
+          timeout: 3000,
+          success: (res) => {
+            if (res.statusCode === 200 && res.data?.code === 0) {
+              // API 返回的格式已经与本地 JS 对齐，直接用
+              resolve(res.data.data);
+            } else {
+              reject(new Error('API 返回异常'));
+            }
+          },
+          fail: reject
+        });
+      });
+    },
+
 
     calcSummary(data) {
       let total = 0, mainBullish = 0, mainBearish = 0, subBullish = 0, subBearish = 0;
@@ -280,6 +309,19 @@ export default {
         const sp = f.sub?.latestKDJ?.pattern || '';
         if (sp.includes('多头')) subBullish++;
         if (sp.includes('空头')) subBearish++;
+      });
+      this.summary = { total, mainBullish, mainBearish, subBullish, subBearish };
+    },
+
+    // 处理 API 返回 list 格式的版本
+    calcSummaryFromList(list) {
+      let total = 0, mainBullish = 0, mainBearish = 0, subBullish = 0, subBearish = 0;
+      list.forEach(f => {
+        total++;
+        if (f.main?.is_long_arranged) mainBullish++;
+        if (f.main?.is_short_arranged) mainBearish++;
+        if (f.sub?.is_long_arranged) subBullish++;
+        if (f.sub?.is_short_arranged) subBearish++;
       });
       this.summary = { total, mainBullish, mainBearish, subBullish, subBearish };
     },
@@ -296,15 +338,23 @@ export default {
     },
 
     getLatestClose(contract) {
-      if (!contract?.data?.length) return '-';
-      const last = contract.data[contract.data.length - 1];
-      return last.close?.toFixed(1) || '-';
+      // API 格式：contract.close 直接给最新价
+      if (contract?.close != null) return Number(contract.close).toFixed(1);
+      // 本地 JS 降级格式：contract.data[last].close
+      if (contract?.data?.length) {
+        const last = contract.data[contract.data.length - 1];
+        return last.close?.toFixed(1) || '-';
+      }
+      return '-';
     },
 
     getIsPending(contract) {
-      if (!contract?.latestKDJ?.custom_rule_2) return false;
-      const rule = contract.latestKDJ.custom_rule_2;
-      if (!rule.includes('pending')) return false;
+      if (!contract) return false;
+      // API 格式：state_tag 字段
+      if (contract.state_tag?.includes('蓄势')) return true;
+      // 本地 JS 降级格式：latestKDJ.custom_rule_2
+      const rule = contract.latestKDJ?.custom_rule_2;
+      if (!rule || !rule.includes('pending')) return false;
       const k = contract.latestKDJ.K;
       const d = contract.latestKDJ.D;
       if (rule === 'pending_long') return k > d;
@@ -313,9 +363,22 @@ export default {
     },
 
     getRuleTags(contract) {
-      if (!contract?.latestKDJ) return [];
+      if (!contract) return [];
       const tags = [];
+
+      // === API 格式：直接用 state_tag ===
+      if (contract.state_tag) {
+        const tag = contract.state_tag;
+        const cls = tag.includes('蓄势') ? 'tag-pending-long'
+                  : tag.includes('复苏') ? 'tag-long'
+                  : tag.includes('走弱') ? 'tag-short' : '';
+        tags.push({ key: 'state', label: tag, cls });
+        return tags;
+      }
+
+      // === 本地 JS 降级格式：latestKDJ.custom_rule_1/2 ===
       const kdj = contract.latestKDJ;
+      if (!kdj) return [];
       if (kdj.custom_rule_1) {
         const map = { long: 'S1: 复苏', short: 'S1: 转弱' };
         const clsMap = { long: 'tag-long', short: 'tag-short' };
@@ -336,10 +399,16 @@ export default {
     },
 
     getPendingLabel(contract) {
+      // API 格式
+      if (contract?.state_tag) return contract.state_tag.includes('蓄势') ? '突破买入/破位卖出' : '突破买入';
+      // 本地 JS
       return contract?.latestKDJ?.custom_rule_2 === 'pending_long' ? '突破买入' : '破位卖出';
     },
 
     getBreakoutPrice(contract) {
+      // API 格式：直接返回 breakout_buy_price
+      if (contract?.breakout_buy_price != null) return Number(contract.breakout_buy_price).toFixed(1);
+      // 本地 JS
       if (!contract?.data?.length) return '-';
       const w2 = contract.data[contract.data.length - 2];
       if (!w2) return '-';
@@ -353,6 +422,9 @@ export default {
     },
 
     getStopPrice(contract) {
+      // API 格式：直接返回 stop_loss_price
+      if (contract?.stop_loss_price != null) return Number(contract.stop_loss_price).toFixed(1);
+      // 本地 JS
       if (!contract?.data?.length) return '-';
       const w3 = contract.data[contract.data.length - 1];
       if (!w3) return '-';
