@@ -1,8 +1,18 @@
 <template>
   <view class="container">
     <view class="app-header">
-      <text class="app-title">📊 股票季线</text>
-      <text class="app-subtitle">季度高低点 & 蓄势信号</text>
+      <view>
+        <text class="app-title">📊 股票季线</text>
+        <text class="app-subtitle">季度高低点 & 蓄势信号</text>
+      </view>
+      <button class="refresh-btn" :disabled="refreshing" @tap="refreshData">
+        {{ refreshing ? '拉取中...' : '🔄 刷新' }}
+      </button>
+    </view>
+
+    <!-- 数据来源标识 -->
+    <view v-if="dataSource === 'local'" class="snapshot-banner">
+      <text>⚠️ 当前显示离线快照数据，云端服务不可用</text>
     </view>
 
     <!-- 筛选栏 -->
@@ -121,6 +131,8 @@ export default {
       allList: [],
       searchText: '',
       filter: 'all',
+      dataSource: 'api', // 'api' | 'local'
+      refreshing: false,
     };
   },
   computed: {
@@ -152,11 +164,19 @@ export default {
     this._loadFromApi();
   },
   methods: {
+    async refreshData() {
+      if (this.refreshing) return;
+      this.refreshing = true;
+      await this._loadFromApi();
+      this.refreshing = false;
+      uni.showToast({ title: this.dataSource === 'api' ? '数据已是最新' : '云端不可用，已加载快照', icon: 'none' });
+    },
+
     async _loadFromApi() {
       try {
         await new Promise((resolve, reject) => {
           uni.request({
-            url: 'http://127.0.0.1:8000/api/stocks/quarterly',
+            url: 'http://175.24.131.147:8000/api/stocks/quarterly',
             method: 'GET',
             timeout: 5000,
             success: (res) => {
@@ -176,6 +196,7 @@ export default {
                     close: q.close,
                   }))
                 }));
+                this.dataSource = 'api';
                 resolve();
               } else {
                 reject(new Error('API 返回异常'));
@@ -197,6 +218,7 @@ export default {
           quarters: [],
           current_price: null,
         }));
+        this.dataSource = 'local';
       }
     },
     onSearchTextInput(e) {
@@ -230,3 +252,31 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.snapshot-banner {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  color: #f59e0b;
+  text-align: center;
+}
+
+.refresh-btn {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  min-width: 80px;
+  height: auto;
+  line-height: 1.4;
+}
+.refresh-btn[disabled] {
+  opacity: 0.5;
+}
+</style>

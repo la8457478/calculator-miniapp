@@ -5,7 +5,7 @@
  */
 
 // 开发：本地 FastAPI  |  上线：改成 https://your-domain.com
-const BASE_URL = 'http://127.0.0.1:8000'
+const BASE_URL = 'http://175.24.131.147:8000'
 
 /**
  * 发出一个 GET 请求并返回 Promise<data>

@@ -1,8 +1,24 @@
 <template>
   <view class="container">
     <view class="app-header">
-      <text class="app-title">📈 期货行情</text>
-      <text class="app-subtitle">周线行情 & KDJ 指标（主力 + 次主力）</text>
+      <view>
+        <text class="app-title">📈 期货行情</text>
+        <text class="app-subtitle">周线行情 & KDJ 指标（主力 + 次主力）</text>
+      </view>
+      <view class="header-actions">
+        <button class="action-btn" :disabled="refreshing" @tap="triggerFetch">
+          {{ fetching ? '爬取中...' : '🕸️ 抓最新' }}
+        </button>
+        <button class="action-btn" :disabled="refreshing" @tap="refreshData">
+          {{ refreshing ? '拉取中...' : '🔄 刷新' }}
+        </button>
+      </view>
+    </view>
+
+    <!-- 数据来源标识 -->
+    <view v-if="dataSource === 'local'" class="snapshot-banner">
+      <text class="snapshot-icon">⚠️</text>
+      <text class="snapshot-text">当前显示离线快照数据，云端服务不可用</text>
     </view>
 
     <!-- 摘要栏 -->
@@ -232,6 +248,9 @@ export default {
       futuresList: [],
       currentFilter: 'all',
       summary: { total: 0, mainBullish: 0, mainBearish: 0, subBullish: 0, subBearish: 0 },
+      dataSource: 'api', // 'api' | 'local'
+      refreshing: false,
+      fetching: false,
       // 蓄势内联计算器状态
       pendingRisk: {},
       pendingResult: {},
@@ -266,23 +285,77 @@ export default {
   methods: {
     async loadData() {
       try {
-        // 优先从后端 API 获取最新数据
         const apiList = await this._fetchFromApi();
         this.futuresList = apiList;
+        this.dataSource = 'api';
         this.calcSummaryFromList(apiList);
       } catch (e) {
         console.warn('[futures] API 获取失败，降级到本地数据:', e.message);
-        // 降级：读本地静态 JS
         const data = getFuturesData();
         this.futuresList = Object.values(data);
+        this.dataSource = 'local';
         this.calcSummary(data);
+      }
+    },
+
+    async refreshData() {
+      if (this.refreshing || this.fetching) return;
+      this.refreshing = true;
+      await this.loadData();
+      this.refreshing = false;
+      uni.showToast({ title: this.dataSource === 'api' ? '数据已是最新' : '云端不可用，已加载快照', icon: 'none' });
+    },
+
+    async triggerFetch() {
+      if (this.fetching || this.refreshing) return;
+      
+      const confirm = await new Promise(resolve => {
+        uni.showModal({
+          title: '触发抓取',
+          content: '爬取最新期货数据预计需要 1~2 分钟，期间请耐心等待，确定执行吗？',
+          success: res => resolve(res.confirm)
+        });
+      });
+      
+      if (!confirm) return;
+
+      this.fetching = true;
+      uni.showLoading({ title: '疯狂爬取中...', mask: true });
+
+      try {
+        await new Promise((resolve, reject) => {
+          uni.request({
+            url: 'http://175.24.131.147:8000/api/futures/trigger_fetch',
+            method: 'POST',
+            timeout: 300000, // 给足 5 分钟超时，因为脚本执行很久
+            success: (res) => {
+              if (res.statusCode === 200 && res.data?.code === 0) {
+                resolve();
+              } else {
+                reject(new Error(res.data?.msg || '爬取请求失败'));
+              }
+            },
+            fail: reject
+          });
+        });
+        uni.hideLoading();
+        uni.showToast({ title: '抓取并入库成功！正在刷新列表...', icon: 'none', duration: 2000 });
+        // 抓取完成自动刷新列表
+        setTimeout(() => {
+          this.refreshData();
+        }, 1500);
+      } catch (e) {
+        uni.hideLoading();
+        uni.showModal({ title: '抓取失败', content: e.message || '请检查服务器状态', showCancel: false });
+      } finally {
+        this.fetching = false;
       }
     },
 
     _fetchFromApi() {
       return new Promise((resolve, reject) => {
         uni.request({
-          url: 'http://127.0.0.1:8000/api/futures/list',
+          url: 'http://175.24.131.147:8000/api/futures/list',
           method: 'GET',
           timeout: 3000,
           success: (res) => {
@@ -543,6 +616,41 @@ export default {
 </script>
 
 <style scoped>
+/* 快照提示 banner */
+.snapshot-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.snapshot-icon { font-size: 1rem; }
+.snapshot-text { font-size: 0.82rem; color: #f59e0b; flex: 1; }
+
+/* 头部按钮区 */
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  min-width: 80px;
+  height: auto;
+  line-height: 1.4;
+  margin: 0;
+}
+.action-btn[disabled] {
+  opacity: 0.5;
+}
 /* H5 专属：图表弹窗 */
 /* #ifdef H5 */
 .chart-modal-overlay {

@@ -126,7 +126,7 @@ export default {
       try {
         await new Promise((resolve, reject) => {
           uni.request({
-            url: `http://127.0.0.1:8000/api/stocks/kline/${this.code}`,
+            url: `http://175.24.131.147:8000/api/stocks/kline/${this.code}`,
             method: 'GET',
             timeout: 8000,
             success: (res) => {
